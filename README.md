@@ -1,361 +1,364 @@
-# 🚀 Agentic Development Bootstrap
+# QR Track
 
-A modular, production-ready template for **Agentic Development Workflows (ADW)** - enabling AI-powered software development from **zero to production**.
+A modern QR code generator with built-in analytics tracking. Generate custom QR codes with color customization, get unique trackable short URLs, and view detailed scan analytics in an intuitive dashboard.
 
-**NEW:** Includes `/architect` and `/scaffold` commands to bootstrap projects from scratch with interactive architecture design.
+## Features
 
-Built from battle-tested patterns extracted from the TAC (Tactical Agentic Coding) course.
+- **Custom QR Code Generation**: Create QR codes with customizable foreground and background colors
+- **Trackable Short URLs**: Each QR code gets a unique short URL for easy sharing
+- **Real-time Analytics**: Track scans with detailed metrics including:
+  - Total scan count
+  - Scans over time (time series)
+  - Device breakdown (mobile, tablet, desktop)
+  - Browser breakdown
+  - Geographic distribution (country, city)
+- **No Authentication Required**: Generate and track QR codes instantly without signup
+- **Privacy-Focused**: IP addresses are truncated for GDPR compliance
+- **Fast Redirects**: <200ms redirect latency with asynchronous tracking
 
-## 🎯 What is This?
+## Tech Stack
 
-This template provides everything you need to build applications using AI agents:
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 3
+- **Database**: Vercel Postgres (PostgreSQL 15)
+- **Deployment**: Vercel
+- **Charts**: Recharts
+- **QR Generation**: qrcode library
 
-- **Structured Commands** - Slash commands for planning, implementing, and testing
-- **Workflow Automation** - Composable workflows with state management
-- **Security Built-in** - Hooks that prevent dangerous operations
-- **Multi-Agent Ready** - Scale to parallel agent execution with git worktrees
-- **Production Proven** - Patterns from real-world agentic applications
+## Prerequisites
 
-## ✨ Key Features
+- Node.js 18.17.0 or higher
+- pnpm 8.0.0 or higher (recommended) or npm
+- Vercel account (for deployment and database)
 
-### Core Features (Always Included)
-- 📋 **Essential Commands** - `/prime`, `/install`, `/feature`, `/bug`, `/chore`, `/implement`, `/test`
-- 🔄 **Basic Workflows** - Plan + Build orchestration
-- 💾 **State Management** - Persistent workflow tracking
-- 🌿 **Git Integration** - Automatic branch creation and commits
-- 🎯 **Type Safety** - Pydantic models for all data structures
+## Quick Start
 
-### Advanced Features (Optional)
-- 🔒 **Security Hooks** - Block dangerous commands and protect sensitive files
-- 🌳 **Git Worktrees** - Parallel agent execution without interference
-- 📊 **Notion Integration** - External task orchestration
-- 📈 **KPI Tracking** - Monitor agent effectiveness
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- [Claude Code CLI](https://claude.com/claude-code) - AI coding assistant
-- Git
-
-### Installation (Clone & Go!)
-
-Simply clone this repository into your new project directory:
+### 1. Clone the Repository
 
 ```bash
-# Create your new project
-mkdir my-new-project
-cd my-new-project
-
-# Clone the bootstrap template (dot at the end clones into current dir)
-git clone https://github.com/gal099/agentic-dev-bootstrap.git .
-
-# Remove the git history to start fresh
-rm -rf .git
-git init
-
-# You're ready! Start with architecture design
-claude -p "/architect" -- "Your project idea here"
+git clone <repository-url>
+cd qr-track
 ```
 
-That's it! The template is ready to use immediately.
-
-### What You Get
-
-After cloning, your project has:
-
-```
-my-new-project/
-├── .claude/
-│   ├── commands/      # All slash commands including /architect and /scaffold
-│   └── settings.json
-├── adws/              # Workflow automation scripts
-├── agents/            # Agent execution tracking (empty initially)
-├── specs/             # Implementation plans (empty initially)
-├── docs/              # Documentation (empty initially)
-└── README.md
-```
-
-## 📖 Usage
-
-### Basic Workflow
-
-1. **Understand your codebase:**
-   ```bash
-   claude -p /prime
-   ```
-
-2. **Plan a feature:**
-   ```bash
-   claude -p "/feature" -- "Add user authentication"
-   ```
-
-3. **Implement the plan:**
-   ```bash
-   claude -p /implement specs/plan-abc12345-user-auth.md
-   ```
-
-4. **Run tests:**
-   ```bash
-   claude -p /test
-   ```
-
-### Using ADW Scripts
-
-Run the complete Plan + Build workflow:
+### 2. Install Dependencies
 
 ```bash
-uv run adws/adw_plan_build.py 123
+# Using pnpm (recommended)
+pnpm install
+
+# Or using npm
+npm install
 ```
 
-This will:
-1. Classify the issue type
-2. Generate an implementation plan
-3. Create a git branch
-4. Implement the plan
-5. Create commits
-6. Track state in `agents/{adw_id}/`
+### 3. Set Up Environment Variables
 
-## 🏗️ Architecture
-
-### Directory Structure
-
-After cloning, your project structure:
-
-```
-your-project/
-├── .claude/
-│   ├── commands/          # Slash command templates
-│   │   ├── architect.md   # 🆕 Bootstrap: Architecture design
-│   │   ├── scaffold.md    # 🆕 Bootstrap: Project scaffolding
-│   │   ├── prime.md
-│   │   ├── feature.md
-│   │   ├── bug.md
-│   │   ├── implement.md
-│   │   └── ...
-│   └── settings.json      # Claude Code configuration
-│
-├── adws/                  # Workflow orchestration
-│   ├── adw_modules/       # Core modules
-│   │   ├── agent.py       # Claude execution
-│   │   ├── state.py       # State management
-│   │   ├── git_ops.py     # Git operations
-│   │   └── data_types.py  # Type definitions
-│   └── adw_plan_build.py  # Example workflow
-│
-├── agents/                # Workflow execution data (created during use)
-│   └── {adw_id}/
-│       ├── adw_state.json
-│       └── planner/
-│
-├── specs/                 # Implementation plans (created during use)
-│   └── plan-{adw_id}-{name}.md
-│
-└── docs/                  # Architecture docs (created by /architect)
-    ├── PRD.md
-    ├── ARCHITECTURE.md
-    ├── TECH_STACK.md
-    └── DATA_MODEL.md
+```bash
+cp .env.example .env
 ```
 
-### Core Concepts
+Edit `.env` and add your Vercel Postgres credentials:
 
-#### ADW ID
-Every workflow execution gets a unique 8-character identifier:
-- Tracks all phases (plan, build, test, review)
-- Enables resume and debugging
-- Links branches, commits, and PRs
+```env
+POSTGRES_URL="postgres://..."
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+```
 
-#### State Management
-Workflows maintain persistent state:
+To get Vercel Postgres credentials:
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Create a new project or select existing
+3. Go to Storage → Create Database → Postgres
+4. Copy the connection strings to your `.env` file
+
+### 4. Set Up Database
+
+Run the database migrations:
+
+```bash
+# Connect to your Postgres database and run:
+psql $POSTGRES_URL -f db/schema.sql
+
+# Optional: Load sample data for testing
+psql $POSTGRES_URL -f db/seed.sql
+```
+
+### 5. Run Development Server
+
+```bash
+pnpm dev
+# or
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+qr-track/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/                # API routes
+│   │   │   ├── qr/generate/    # QR code generation endpoint
+│   │   │   └── analytics/[qrId]/ # Analytics endpoint
+│   │   ├── r/[shortCode]/      # Redirect handler
+│   │   ├── analytics/[qrId]/   # Analytics dashboard page
+│   │   ├── layout.tsx          # Root layout
+│   │   ├── page.tsx            # Home page (generator)
+│   │   └── globals.css         # Global styles
+│   ├── components/             # React components
+│   │   ├── QRGenerator.tsx     # QR code generator UI
+│   │   └── AnalyticsDashboard.tsx # Analytics dashboard UI
+│   ├── lib/                    # Utility functions
+│   │   ├── db.ts               # Database queries
+│   │   ├── qr-generator.ts     # QR code generation
+│   │   └── utils.ts            # Helper functions
+│   └── types/                  # TypeScript types
+│       ├── database.ts         # Database entity types
+│       └── api.ts              # API request/response types
+├── db/                         # Database files
+│   ├── schema.sql              # Complete database schema
+│   ├── migrations/             # Migration files
+│   │   ├── 001_create_qr_codes_table.sql
+│   │   └── 002_create_scans_table.sql
+│   └── seed.sql                # Sample data for testing
+├── docs/                       # Documentation
+│   ├── PRD.md                  # Product Requirements
+│   ├── ARCHITECTURE.md         # System Architecture
+│   ├── TECH_STACK.md           # Technology Stack
+│   └── DATA_MODEL.md           # Database Schema
+├── public/                     # Static assets
+├── package.json                # Dependencies and scripts
+├── tsconfig.json               # TypeScript configuration
+├── tailwind.config.ts          # Tailwind CSS configuration
+├── next.config.js              # Next.js configuration
+└── README.md                   # This file
+```
+
+## API Endpoints
+
+### POST /api/qr/generate
+
+Generate a new QR code with tracking.
+
+**Request Body:**
 ```json
 {
-  "adw_id": "abc12345",
-  "issue_number": 123,
-  "branch_name": "feat-123-abc12345-description",
-  "plan_file": "specs/plan-abc12345-feature.md",
-  "issue_class": "/feature",
-  "model_set": "base"
+  "targetUrl": "https://example.com",
+  "fgColor": "#000000",
+  "bgColor": "#FFFFFF"
 }
 ```
 
-#### Composable Workflows
-Scripts can be chained via pipes:
-```bash
-uv run adw_plan.py 123 | uv run adw_build.py | uv run adw_test.py
+**Response:**
+```json
+{
+  "id": 1,
+  "short_code": "abc123xyz",
+  "short_url": "https://qr-track.vercel.app/r/abc123xyz",
+  "qr_code_data_url": "data:image/png;base64,...",
+  "analytics_url": "https://qr-track.vercel.app/analytics/1"
+}
 ```
 
-## 🔧 Available Commands
+### GET /api/analytics/[qrId]
 
-### 🆕 Bootstrap Commands (NEW!)
-- `/architect` - **Interactive project architecture design** - Ask critical questions, generate PRD and tech stack decisions
-- `/scaffold` - **Generate project structure** - Create directories, dependencies, and boilerplate based on approved architecture
+Fetch analytics for a QR code.
 
-### Project Setup
-- `/install` - Install dependencies
-- `/prime` - Understand codebase
-- `/tools` - List available commands
-
-### Planning
-- `/chore` - Plan maintenance tasks
-- `/bug` - Plan bug fixes
-- `/feature` - Plan new features
-
-### Execution
-- `/implement` - Execute implementation plan
-- `/commit` - Create formatted git commits
-- `/test` - Run test suite
-
-### Utilities
-- `/classify_issue` - Classify issue type
-
-## 🔒 Security Features
-
-When you enable security hooks, the system automatically:
-
-### Blocks Dangerous Operations
-- ❌ `rm -rf` on system paths
-- ❌ Direct `.env` file access
-- ❌ Force pushes to protected branches
-
-### Maintains Audit Logs
-- ✅ All tool calls logged
-- ✅ Session-specific tracking
-- ✅ Performance monitoring data
-
-Logs stored in `.claude/logs/` (add to `.gitignore`)
-
-## 🌳 Advanced: Multi-Agent Workflows
-
-For complex projects, enable git worktrees:
-
-```bash
-# Each agent gets isolated workspace
-trees/
-├── abc12345/  # Agent 1 workspace
-└── def67890/  # Agent 2 workspace
+**Response:**
+```json
+{
+  "total_scans": 42,
+  "scans_by_date": [
+    { "date": "2026-02-12", "count": 15 }
+  ],
+  "device_breakdown": [
+    { "device_type": "mobile", "count": 25 },
+    { "device_type": "desktop", "count": 17 }
+  ],
+  "browser_breakdown": [
+    { "browser": "Chrome", "count": 30 },
+    { "browser": "Safari", "count": 12 }
+  ],
+  "location_breakdown": [
+    { "country": "US", "city": "San Francisco", "count": 20 }
+  ]
+}
 ```
 
-Benefits:
-- Parallel execution without conflicts
-- Isolated port allocation (9100-9114, 9200-9214)
-- Independent testing per agent
-- Easy cleanup
+### GET /r/[shortCode]
 
-## 🆕 Bootstrap Workflow (Start from Zero)
+Redirect to target URL and track scan event.
 
-### New Project from Scratch
+**Response:** 302 redirect to target URL
 
-**Step 1: Architecture Design (Interactive)**
+## Development
+
+### Available Scripts
+
 ```bash
-claude -p "/architect" -- "E-commerce platform with product catalog, shopping cart, and checkout"
+# Run development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start
+
+# Lint code
+pnpm lint
+
+# Type check
+pnpm type-check
 ```
 
-The agent will:
-- Ask critical questions about scale, stack, authentication, etc.
-- Generate comprehensive docs:
-  - `docs/PRD.md` - Product requirements
-  - `docs/ARCHITECTURE.md` - Technical decisions
-  - `docs/TECH_STACK.md` - Stack with justifications
-  - `docs/DATA_MODEL.md` - Database schemas
+### Code Quality
 
-**Step 2: Review and Approve**
-- Review generated documentation
-- Provide feedback or approve
+The project uses:
+- **ESLint**: Linting with Next.js recommended config
+- **Prettier**: Code formatting with Tailwind plugin
+- **TypeScript**: Strict mode enabled
 
-**Step 3: Generate Project Structure**
+## Deployment
+
+### Deploy to Vercel
+
+1. **Push to GitHub** (if not already)
+
 ```bash
-claude -p "/scaffold"
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin <your-repo-url>
+git push -u origin main
 ```
 
-Creates complete project skeleton:
-- Directory structure
-- Dependencies configured
-- Boilerplate code
-- Configuration files
-- Development setup
+2. **Connect to Vercel**
 
-**Step 4: Iterative Development**
-```bash
-# Start building features
-claude -p "/feature" -- "User authentication"
-claude -p "/implement" specs/plan-xxx-auth.md
-claude -p "/test"
+   - Go to [Vercel Dashboard](https://vercel.com/new)
+   - Import your repository
+   - Configure environment variables (copy from `.env`)
+   - Deploy
+
+3. **Set Up Database**
+
+   - In Vercel dashboard: Storage → Create Database → Postgres
+   - Run migrations using Vercel Postgres dashboard SQL editor
+   - Paste contents of `db/schema.sql` and execute
+
+4. **Update Environment Variables**
+
+   - Set `NEXT_PUBLIC_BASE_URL` to your production URL
+   - Vercel automatically provides `POSTGRES_URL` and related variables
+
+### Environment Variables
+
+Required environment variables:
+
+```env
+# Database (auto-provided by Vercel Postgres)
+POSTGRES_URL=
+POSTGRES_PRISMA_URL=
+POSTGRES_URL_NON_POOLING=
+POSTGRES_USER=
+POSTGRES_HOST=
+POSTGRES_PASSWORD=
+POSTGRES_DATABASE=
+
+# Application
+NEXT_PUBLIC_BASE_URL=  # Your production URL
 ```
+
+## Performance
+
+Target performance metrics:
+- **QR Generation**: <1 second
+- **Redirect Latency**: <200ms
+- **Analytics Load**: <2 seconds
+- **Page Load**: <2 seconds on 3G
+
+## Security
+
+- ✅ HTTPS enforced (Vercel automatic)
+- ✅ SQL injection prevention (parameterized queries)
+- ✅ XSS protection (React auto-escaping)
+- ✅ GDPR compliance (IP truncation)
+- ✅ Secure short codes (nanoid, 21 chars)
+- ✅ Security headers (CSP, HSTS, X-Frame-Options)
+
+## Documentation
+
+Detailed documentation is available in the `docs/` directory:
+
+- [Product Requirements Document (PRD)](docs/PRD.md)
+- [System Architecture](docs/ARCHITECTURE.md)
+- [Technology Stack](docs/TECH_STACK.md)
+- [Data Model](docs/DATA_MODEL.md)
+
+## Troubleshooting
+
+### Database Connection Error
+
+**Error**: `Failed to connect to database`
+
+**Solution**:
+1. Verify Vercel Postgres is created and running
+2. Check `.env` has correct connection strings
+3. Ensure database schema is applied (`db/schema.sql`)
+
+### QR Code Not Redirecting
+
+**Error**: QR code scan shows "not found"
+
+**Solution**:
+1. Check short code exists in database
+2. Verify `NEXT_PUBLIC_BASE_URL` is correct
+3. Check Vercel deployment logs for errors
+
+### Analytics Not Loading
+
+**Error**: Dashboard shows "Failed to fetch analytics"
+
+**Solution**:
+1. Verify QR code ID is valid
+2. Check database has scans table
+3. Review Vercel function logs
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions:
+- Open an issue on GitHub
+- Check [documentation](docs/)
+- Review [architecture decisions](docs/ARCHITECTURE.md)
+
+## Roadmap
+
+Future enhancements (post-MVP):
+- [ ] User authentication (NextAuth.js)
+- [ ] Custom short URL slugs (vanity URLs)
+- [ ] QR code templates and presets
+- [ ] Logo embedding in QR codes
+- [ ] Export analytics as CSV
+- [ ] API access for programmatic generation
+- [ ] Real-time analytics (live updates)
+- [ ] QR code expiration dates
+- [ ] Password-protected QR codes
 
 ---
 
-## 📚 Examples
-
-### Example 1: Simple Feature
-```bash
-# Plan and implement in one go
-uv run adws/adw_plan_build.py 123 <<EOF
-Add a dark mode toggle to the settings page.
-It should save the preference to localStorage.
-EOF
-```
-
-### Example 2: Bug Fix Workflow
-```bash
-# Plan the fix
-claude -p "/bug" -- "Fix null pointer error in user profile"
-
-# Review and implement
-claude -p /implement specs/plan-abc12345-fix-null-pointer.md
-
-# Test
-claude -p /test
-```
-
-### Example 3: Chain Multiple Phases
-```bash
-# Complex workflow with testing
-uv run adws/adw_plan.py 123 | \
-uv run adws/adw_build.py | \
-uv run adws/adw_test.py
-```
-
-## 🎓 Learn More
-
-### Core Concepts
-- **ADW (Agentic Development Workflow)**: AI-driven SDLC automation
-- **Slash Commands**: Template-based AI instructions
-- **State Threading**: Persistent workflow data across phases
-- **Model Selection**: Dynamic Sonnet/Opus routing based on complexity
-
-### Best Practices
-1. **Always start with `/prime`** - Understand before changing
-2. **Use structured planning** - Feature/bug/chore templates
-3. **Enable security hooks** - Prevent accidents
-4. **Track with ADW IDs** - Resume and debug workflows
-5. **Compose incrementally** - Chain simple scripts
-
-## 🤝 Contributing
-
-This template is based on the TAC (Tactical Agentic Coding) course patterns. Contributions welcome!
-
-### Areas for Enhancement
-- Additional slash commands
-- More workflow orchestrators
-- Integration templates (GitHub, Notion, Jira)
-- Testing frameworks
-- Documentation generators
-
-## 📄 License
-
-MIT License - Use freely in your projects
-
-## 🙏 Credits
-
-Built from patterns in the [TAC Agentic Coding Course](https://github.com/your-course-link).
-
-Inspired by real-world production agentic applications including:
-- NLQ-to-SQL interfaces
-- Multi-agent task boards
-- Rapid prototyping systems
-- Full SDLC automation
-
----
-
-**Ready to build with AI agents?** Run `./init.sh` to get started! 🚀
+Built with ❤️ using Next.js and deployed on Vercel
