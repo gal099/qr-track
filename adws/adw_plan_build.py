@@ -53,58 +53,37 @@ def fetch_github_issue(issue_number: int) -> dict:
         sys.exit(1)
 
 
-def extract_classification(text: str) -> str:
-    """
-    Extract slash command from Claude's response.
-
-    Handles cases where Claude includes explanation + classification.
-    """
-    import re
-
-    # Look for /chore, /bug, /feature, /patch, or 0 in the text
-    patterns = [
-        r'(/chore|/bug|/feature|/patch)',  # Slash commands
-        r'\b(0)\b',  # Just 0
-    ]
-
-    for pattern in patterns:
-        match = re.search(pattern, text)
-        if match:
-            return match.group(1)
-
-    # If nothing found, return the last line (likely contains the classification)
-    lines = text.strip().split('\n')
-    last_line = lines[-1].strip().strip('`').strip()
-
-    return last_line
-
-
 def classify_issue(issue_content: str, adw_id: str) -> str:
     """
-    Classify issue into command type.
+    Classify issue into command type based on keywords.
 
     Returns: /chore, /bug, /feature, or /patch
     """
-    request = AgentTemplateRequest(
-        agent_name="classifier",
-        slash_command="/classify_issue",
-        args=[issue_content],
-        adw_id=adw_id,
-    )
+    content_lower = issue_content.lower()
 
-    response = prompt_claude_code_with_retry(request)
-    if not response.success:
-        print(f"Error classifying issue: {response.error}")
-        sys.exit(1)
+    # Bug indicators
+    bug_keywords = ['fix', 'bug', 'error', 'broken', 'crash', 'issue', 'failing']
+    if any(keyword in content_lower for keyword in bug_keywords):
+        return "/bug"
 
-    # Extract classification from response
-    classification = extract_classification(response.result)
+    # Chore indicators
+    chore_keywords = ['refactor', 'update', 'upgrade', 'dependency', 'dependencies',
+                      'setup', 'configure', 'config', 'install', 'architecture', 'scaffold']
+    if any(keyword in content_lower for keyword in chore_keywords):
+        return "/chore"
 
-    if classification == "0":
-        print("Error: Could not classify issue")
-        sys.exit(1)
+    # Patch indicators
+    patch_keywords = ['review', 'pr comment', 'feedback', 'small fix', 'minor']
+    if any(keyword in content_lower for keyword in patch_keywords):
+        return "/patch"
 
-    return classification
+    # Default to feature for new functionality
+    feature_keywords = ['implement', 'add', 'create', 'feature', 'new', 'build']
+    if any(keyword in content_lower for keyword in feature_keywords):
+        return "/feature"
+
+    # If nothing matches, default to feature
+    return "/feature"
 
 
 def create_plan(issue_number: int, adw_id: str, issue_class: str, issue_content: str) -> str:
