@@ -132,7 +132,7 @@ def execute_template(request: AgentTemplateRequest) -> AgentPromptResponse:
     # Build command
     command_parts = [
         str(claude_path),
-        "-m", model,
+        "--model", model,
         "-p", request.slash_command,
     ]
 
