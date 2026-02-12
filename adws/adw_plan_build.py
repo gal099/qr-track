@@ -12,6 +12,7 @@ Example:
 
 import sys
 import json
+import subprocess
 from pathlib import Path
 
 # Add adw_modules to path
@@ -26,6 +27,30 @@ from adw_modules import (
     commit_changes,
     generate_branch_name,
 )
+
+
+def fetch_github_issue(issue_number: int) -> dict:
+    """
+    Fetch issue from GitHub using gh CLI.
+
+    Returns: dict with 'title' and 'body' keys
+    """
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "view", str(issue_number), "--json", "title,body"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        issue_data = json.loads(result.stdout)
+        return issue_data
+    except subprocess.CalledProcessError as e:
+        print(f"Error fetching issue from GitHub: {e.stderr}")
+        print("Make sure you have gh CLI installed and authenticated")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing GitHub issue data: {e}")
+        sys.exit(1)
 
 
 def classify_issue(issue_content: str, adw_id: str) -> str:
@@ -135,8 +160,15 @@ def main():
     issue_number = int(sys.argv[1])
     provided_adw_id = sys.argv[2] if len(sys.argv) > 2 else None
 
-    # For this example, issue content from command line or stdin
-    issue_content = input("Enter issue description: ") if sys.stdin.isatty() else sys.stdin.read()
+    # Fetch issue from GitHub
+    print(f"\n📥 Fetching issue #{issue_number} from GitHub...")
+    issue_data = fetch_github_issue(issue_number)
+    issue_title = issue_data.get("title", "")
+    issue_body = issue_data.get("body", "")
+    issue_content = f"{issue_title}\n\n{issue_body}"
+
+    print(f"✅ Issue fetched: {issue_title}")
+    print(f"\n📋 Issue content:\n{'-' * 60}\n{issue_content}\n{'-' * 60}\n")
 
     print(f"\n🚀 Starting ADW Plan + Build for issue #{issue_number}")
 
