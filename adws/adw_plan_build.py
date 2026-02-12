@@ -27,6 +27,7 @@ from adw_modules import (
     commit_changes,
     generate_branch_name,
 )
+from adw_modules.github import make_issue_comment, format_issue_message
 
 
 def fetch_github_issue(issue_number: int) -> dict:
@@ -220,6 +221,12 @@ def main():
     state.update(issue_number=issue_number)
     state.save("adw_plan_build")
 
+    # Post initial comment
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "ops", "✅ Starting ADW Plan + Build workflow")
+    )
+
     # Step 1: Classify issue
     print("\n🔍 Classifying issue...")
     issue_class = classify_issue(issue_content, adw_id)
@@ -227,6 +234,11 @@ def main():
 
     state.update(issue_class=issue_class)
     state.save("adw_plan_build")
+
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "classifier", f"✅ Issue classified as: {issue_class}")
+    )
 
     # Step 2: Generate branch name and create branch
     print("\n🌿 Creating branch...")
@@ -237,31 +249,71 @@ def main():
     state.update(branch_name=branch_name)
     state.save("adw_plan_build")
 
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "ops", f"✅ Working on branch: `{branch_name}`")
+    )
+
     # Step 3: Create plan
     print("\n📝 Creating implementation plan...")
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "planner", "🔨 Building implementation plan...")
+    )
+
     plan_file = create_plan(issue_number, adw_id, issue_class, issue_content)
     print(f"✅ Plan created: {plan_file}")
 
     state.update(plan_file=plan_file)
     state.save("adw_plan_build")
 
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "planner", f"✅ Implementation plan created: `{plan_file}`")
+    )
+
     # Commit plan
     commit_msg = create_commit("planner", issue_class, issue_content, adw_id)
     commit_changes(commit_msg)
     print(f"✅ Plan committed: {commit_msg}")
 
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "planner", "✅ Plan committed to git")
+    )
+
     # Step 4: Implement plan
     print("\n⚙️  Implementing plan...")
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "implementor", "🔨 Implementing plan...")
+    )
+
     implement_plan(plan_file, adw_id)
     print("✅ Implementation complete")
+
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "implementor", "✅ Implementation complete")
+    )
 
     # Commit implementation
     commit_msg = create_commit("implementor", issue_class, issue_content, adw_id)
     commit_changes(commit_msg)
     print(f"✅ Implementation committed: {commit_msg}")
 
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "implementor", "✅ Implementation committed to git")
+    )
+
     print(f"\n✨ Workflow complete! ADW ID: {adw_id}")
     print(f"📂 State saved in: agents/{adw_id}/")
+
+    make_issue_comment(
+        str(issue_number),
+        format_issue_message(adw_id, "ops", f"✨ ADW Plan + Build workflow complete! Branch: `{branch_name}`")
+    )
 
 
 if __name__ == "__main__":
