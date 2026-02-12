@@ -57,36 +57,52 @@ def get_model_for_slash_command(
 
 def parse_jsonl_output(output: str) -> AgentPromptResponse:
     """
-    Parse JSONL output from Claude Code CLI.
+    Parse JSON output from Claude Code CLI.
 
     Args:
-        output: Raw JSONL output string
+        output: Raw JSON output string
 
     Returns:
         Parsed response with result or error
     """
-    lines = output.strip().split("\n")
     result_message: Optional[str] = None
     error_message: Optional[str] = None
 
-    for line in lines:
-        if not line.strip():
-            continue
+    try:
+        # Try parsing as single JSON object first (--output-format json)
+        data = json.loads(output.strip())
 
-        try:
-            data = json.loads(line)
+        if isinstance(data, dict):
+            # Check for error
+            if data.get("is_error") or data.get("type") == "error":
+                error_message = data.get("error") or data.get("result")
+            # Extract result
+            elif "result" in data:
+                result_message = data["result"]
+            elif "text" in data:
+                result_message = data["text"]
 
-            # Look for result in various message formats
-            if isinstance(data, dict):
-                if "result" in data:
-                    result_message = data["result"]
-                elif "text" in data:
-                    result_message = data["text"]
-                elif "error" in data:
-                    error_message = data["error"]
+    except json.JSONDecodeError:
+        # Fallback: Try parsing as JSONL (multiple JSON objects)
+        lines = output.strip().split("\n")
 
-        except json.JSONDecodeError:
-            continue
+        for line in lines:
+            if not line.strip():
+                continue
+
+            try:
+                data = json.loads(line)
+
+                if isinstance(data, dict):
+                    if "result" in data:
+                        result_message = data["result"]
+                    elif "text" in data:
+                        result_message = data["text"]
+                    elif "error" in data:
+                        error_message = data["error"]
+
+            except json.JSONDecodeError:
+                continue
 
     success = result_message is not None and error_message is None
 
@@ -133,7 +149,9 @@ def execute_template(request: AgentTemplateRequest) -> AgentPromptResponse:
     command_parts = [
         str(claude_path),
         "--model", model,
+        "--output-format", "json",
         "-p", request.slash_command,
+        "--",
     ]
 
     # Add arguments

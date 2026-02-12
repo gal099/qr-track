@@ -53,6 +53,32 @@ def fetch_github_issue(issue_number: int) -> dict:
         sys.exit(1)
 
 
+def extract_classification(text: str) -> str:
+    """
+    Extract slash command from Claude's response.
+
+    Handles cases where Claude includes explanation + classification.
+    """
+    import re
+
+    # Look for /chore, /bug, /feature, /patch, or 0 in the text
+    patterns = [
+        r'(/chore|/bug|/feature|/patch)',  # Slash commands
+        r'\b(0)\b',  # Just 0
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+
+    # If nothing found, return the last line (likely contains the classification)
+    lines = text.strip().split('\n')
+    last_line = lines[-1].strip().strip('`').strip()
+
+    return last_line
+
+
 def classify_issue(issue_content: str, adw_id: str) -> str:
     """
     Classify issue into command type.
@@ -71,7 +97,9 @@ def classify_issue(issue_content: str, adw_id: str) -> str:
         print(f"Error classifying issue: {response.error}")
         sys.exit(1)
 
-    classification = response.result.strip()
+    # Extract classification from response
+    classification = extract_classification(response.result)
+
     if classification == "0":
         print("Error: Could not classify issue")
         sys.exit(1)

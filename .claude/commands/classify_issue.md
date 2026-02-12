@@ -29,11 +29,24 @@ Classify a GitHub issue or task description into a command type.
 
 ## Output Format
 
-Return ONLY the slash command classification:
-- `/chore`
-- `/bug`
-- `/feature`
-- `/patch`
-- `0`
+CRITICAL: Return ONLY the slash command classification. Nothing else.
 
-No explanation, no additional text.
+Valid outputs:
+- /chore
+- /bug
+- /feature
+- /patch
+- 0
+
+Example outputs (these are the ONLY acceptable formats):
+/feature
+/bug
+0
+
+DO NOT include:
+- Explanations or reasoning
+- Markdown code blocks or backticks
+- Additional text before or after
+- Line breaks or extra whitespace
+
+Just output the command. That's it.
