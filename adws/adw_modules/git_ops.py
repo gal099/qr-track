@@ -199,3 +199,94 @@ def has_uncommitted_changes(working_dir: Optional[Path] = None) -> bool:
     has_staged = returncode != 0
 
     return has_unstaged or has_staged
+
+
+def push_branch(branch_name: str, working_dir: Optional[Path] = None) -> Tuple[bool, Optional[str]]:
+    """
+    Push branch to remote.
+
+    Args:
+        branch_name: Name of branch to push
+        working_dir: Directory to run command in
+
+    Returns:
+        Tuple of (success, error_message)
+    """
+    try:
+        run_git_command(["push", "-u", "origin", branch_name], working_dir)
+        return True, None
+    except RuntimeError as e:
+        return False, str(e)
+
+
+def check_pr_exists(branch_name: str) -> Optional[str]:
+    """
+    Check if a PR exists for the branch.
+
+    Returns:
+        PR URL if exists, None otherwise
+    """
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "view", branch_name, "--json", "url", "-q", ".url"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+
+        return None
+    except Exception:
+        return None
+
+
+def create_pull_request(
+    branch_name: str,
+    issue_number: int,
+    title: str,
+    body: str,
+) -> Tuple[bool, Optional[str], Optional[str]]:
+    """
+    Create a pull request using gh CLI.
+
+    Args:
+        branch_name: Source branch name
+        issue_number: Issue number being resolved
+        title: PR title
+        body: PR description
+
+    Returns:
+        Tuple of (success, pr_url, error_message)
+    """
+    # Check if PR already exists
+    existing_pr = check_pr_exists(branch_name)
+    if existing_pr:
+        return True, existing_pr, None
+
+    try:
+        result = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--title",
+                title,
+                "--body",
+                body,
+                "--base",
+                "main",
+                "--head",
+                branch_name,
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        pr_url = result.stdout.strip()
+        return True, pr_url, None
+
+    except subprocess.CalledProcessError as e:
+        return False, None, e.stderr

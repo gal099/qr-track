@@ -24,6 +24,8 @@ from .git_ops import (
     get_main_branch,
     generate_branch_name,
     has_uncommitted_changes,
+    push_branch,
+    create_pull_request,
 )
 from .state import ADWState, ensure_adw_id
 
@@ -48,6 +50,8 @@ __all__ = [
     "get_main_branch",
     "generate_branch_name",
     "has_uncommitted_changes",
+    "push_branch",
+    "create_pull_request",
     # State
     "ADWState",
     "ensure_adw_id",
