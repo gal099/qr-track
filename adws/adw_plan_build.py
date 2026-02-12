@@ -82,6 +82,42 @@ def classify_issue(issue_content: str, adw_id: str) -> str:
     return "/feature"
 
 
+def extract_plan_path(text: str) -> str:
+    """
+    Extract plan file path from Claude's response.
+
+    Looks for patterns like:
+    - specs/plan-xxx.md
+    - `specs/plan-xxx.md`
+    - **Plan File:** `specs/plan-xxx.md`
+    """
+    import re
+
+    # Try to find specs/plan-*.md pattern
+    patterns = [
+        r'`(specs/plan-[^`]+\.md)`',  # Backtick wrapped
+        r'(specs/plan-\S+\.md)',  # Plain path
+        r'Plan File.*?`(specs/plan-[^`]+\.md)`',  # After "Plan File:"
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+
+    # If no pattern matches, check if any line contains specs/
+    lines = text.split('\n')
+    for line in lines:
+        if 'specs/' in line and '.md' in line:
+            # Extract just the path
+            match = re.search(r'(specs/[^\s`]+\.md)', line)
+            if match:
+                return match.group(1)
+
+    # Last resort: return the text as-is and let it fail with better error
+    return text.strip()
+
+
 def create_plan(issue_number: int, adw_id: str, issue_class: str, issue_content: str) -> str:
     """
     Create implementation plan.
@@ -108,7 +144,7 @@ def create_plan(issue_number: int, adw_id: str, issue_class: str, issue_content:
         sys.exit(1)
 
     # Extract plan file path from response
-    plan_file = response.result.strip()
+    plan_file = extract_plan_path(response.result)
     return plan_file
 
 
