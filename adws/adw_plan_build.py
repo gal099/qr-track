@@ -57,32 +57,28 @@ def classify_issue(issue_content: str, adw_id: str) -> str:
     """
     Classify issue into command type based on keywords.
 
-    Returns: /chore, /bug, /feature, or /patch
+    Returns: /bug, /chore, or /feature
     """
     content_lower = issue_content.lower()
 
+    # Feature indicators (check FIRST - most common)
+    feature_keywords = ['implement', 'add', 'create', 'feature', 'new', 'build',
+                       'generation', 'dashboard', 'analytics', 'form', 'component']
+    if any(keyword in content_lower for keyword in feature_keywords):
+        return "/feature"
+
     # Bug indicators
-    bug_keywords = ['fix', 'bug', 'error', 'broken', 'crash', 'issue', 'failing']
+    bug_keywords = ['fix bug', 'bug:', 'error:', 'broken', 'crash', 'failing test']
     if any(keyword in content_lower for keyword in bug_keywords):
         return "/bug"
 
     # Chore indicators
-    chore_keywords = ['refactor', 'update', 'upgrade', 'dependency', 'dependencies',
+    chore_keywords = ['refactor', 'update deps', 'upgrade', 'dependency',
                       'setup', 'configure', 'config', 'install', 'architecture', 'scaffold']
     if any(keyword in content_lower for keyword in chore_keywords):
         return "/chore"
 
-    # Patch indicators
-    patch_keywords = ['review', 'pr comment', 'feedback', 'small fix', 'minor']
-    if any(keyword in content_lower for keyword in patch_keywords):
-        return "/patch"
-
-    # Default to feature for new functionality
-    feature_keywords = ['implement', 'add', 'create', 'feature', 'new', 'build']
-    if any(keyword in content_lower for keyword in feature_keywords):
-        return "/feature"
-
-    # If nothing matches, default to feature
+    # Default to feature
     return "/feature"
 
 
