@@ -5,6 +5,7 @@ Handles subprocess execution, JSONL output parsing, and retry logic.
 """
 
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -108,14 +109,16 @@ def execute_template(request: AgentTemplateRequest) -> AgentPromptResponse:
     Returns:
         Response with result or error
     """
-    # Get Claude Code CLI path
-    claude_path = Path.home() / ".local" / "bin" / "claude"
-    if not claude_path.exists():
+    # Get Claude Code CLI path from system PATH
+    claude_path_str = shutil.which("claude")
+    if not claude_path_str:
         return AgentPromptResponse(
             success=False,
-            error=f"Claude Code CLI not found at {claude_path}",
+            error="Claude Code CLI not found in PATH. Make sure Claude Code is installed.",
             should_retry=False,
         )
+
+    claude_path = Path(claude_path_str)
 
     # Determine model to use
     if request.model:
